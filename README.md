@@ -21,42 +21,37 @@ Node server: This will be the glue. managing the asterisk server and the callers
 voip: Voice over IP.
  
 User flow (caller).
-1. The user downloads a voip app on their phone
-2. The user registers as active on the the web client. For the prototype, the web client will be both minimal and not integrated with the existing call for corybn site. It will not allow the user to enter data after the call  (ben: could be a stretch goal?).
-
-(Olugbenga)
-> For one touch dialling, it will serve as both a simulator and minimal. This can easily be integrated because it is just one button on the interface. For the predictive dialler, it will be too complicated to integrate and will be a long term effort. 
-3. The user will recieve a call via their voip app.
-4. Once the user has finished making calls they will end their session via the web client. 
+ 1. The user downloads a voip app on their phone
+ 2. The user registers as active on the the web client (they are on the line from this point). For the prototype, the web client will be both minimal and not integrated with the existing call for corybn site. It will not allow the user to enter data after the call  (ben: could be a stretch goal?).
+ 
+ > (Olugbenga) For one touch dialling, it will serve as both a simulator and minimal. This can easily be integrated because it is just one button on the interface. For the predictive dialler, it will be too complicated to integrate and will be a long term effort.
+ 3. The caller gets connected to a callee.
+ 4. Once the user has finished making calls they will end their session via the web client. 
 and callee numbers, It will act as a controller for the asterisk server, passing the asterisk server Callee numbers, managing the callers sessions and passing active callers
 
-(Olugbenga)
-> We need to have clarity on how the system will be used. For now I'm assuming the web client will be used by onsite users and road warriors and the app is responsive to cater for smart phone screen sizes. What you have described above is called predictive dialling. The way in which predictive dialling is used in the UK is regulated. Abandoned call rates must not exceed 3% of live calls for any 24-hour period for each campaign. Records must be kept to demonstrate compliance with these requirements. What does this mean for us? It will be difficult to involve road warriors because they are out of a controlled environment where swift call pick ups can be enforced. The feasible approach is to build a systems that serves the road warrior with one touch dialling and predictive dialling for call centre use. 
 
-(@des-des)
->I think for now our only target is road warriors. I think we should focus on this use case for now. By road warriors you mean volunteers calling from home? Can you expand on how you think things should work in their case .
+> (Olugbenga) We need to have clarity on how the system will be used. For now I'm assuming the web client will be used by onsite users and road warriors and the app is responsive to cater for smart phone screen sizes. What you have described above is called predictive dialling. The way in which predictive dialling is used in the UK is regulated. Abandoned call rates must not exceed 3% of live calls for any 24-hour period for each campaign. Records must be kept to demonstrate compliance with these requirements. What does this mean for us? It will be difficult to involve road warriors because they are out of a controlled environment where swift call pick ups can be enforced. The feasible approach is to build a systems that serves the road warrior with one touch dialling and predictive dialling for call centre use. 
+
+
+> (@des-des) I think for now our only target is road warriors. I think we should focus on this use case for now. By road warriors you mean volunteers calling from home? Can you expand on how you think things should work in their case .
 
 What is happening during the user flow.
-We need to be careful what we are promising that we can deliver what we are promising.
-2.1 The user makes a page request to the node server.
-2.2 The node server responds with the web client.
-2.3 The user uses the web client to register an active session on the node server.
-
-(Olugbenga)
-> Points 2.1 -  2.3 will happen for a one touch dialling but won't do 2.4. It will make a call. For predictive dialling, the callers have no business initiating the calls, the system does that.
-2.4 The node server tells asterisk to start making calls to the callees.
-This will happen in a call centre operation where predictive dialling is used
-2.5 The Asterisk server makes a connection to the provider.
-Yes this will always happen for every call
-2.6 The Asterisk server begins making calls to callees, via the provider
-This doesn't happen through one connection, a connection is made per every call. 
-3.0 When a callee answers a call asterisk will tell the node server it has made a connection.
-For predictive dialling, yes.
-3.1 The node server will respond with the with the information the asterisk server needs to call the user/caller via voip.
+ 1. The user registers as active on the the web client
+   1. The user makes a page request to the node server.
+   2. The node server responds with the web client.
+   3. The user uses the web client to register an active session on the node server.
+     > (Olugbenga) Points 2.1 -  2.3 will happen for a one touch dialling but won't do 2.4. It will make a call. For predictive dialling, the callers have no business initiating the calls, the system does that.
+   4. The node server tells asterisk to start making calls to the callees.
+   5. The Asterisk server makes a connection to the provider.
+   6. The Asterisk server begins making calls to callees, via the provider
+ 
+  > (Olugbenga) This doesn't happen through one connection, a connection is made per every call. 
+ 2.  The caller gets connected to a callee.
+   1. When a callee answers a call asterisk will tell the node server it has made a connection.
+   2. The node server will respond with the with the information the asterisk server needs to call the user/caller via voip.
 The asterisk service is in charge at this point, it does it without any further instructions from the node server.
-3.2 when the user/caller answers (they should do this quickly) Asterisk will connect the caller and the callee.
+   3. when the user/caller answers (they should do this quickly) Asterisk will connect the caller and the callee.
 Yes for predictive dialling with the potentials for abandoned calls. For one touch dialling the caller will be called first and the caller will be waiting on the callee.
-> This approach may lose some of the large benefit of the project, ie if the callers have to wait  then get hung up on they will be both less efficient and there will probably be a high dropout rate for volunteers. Maybe there is no way round this problem though .. :(
  
 Stack:
 Docker: The backend will held in a collection of docker containers. This will allow us to easily deploy into the existing infrastructure, while allowing us to scale later.
